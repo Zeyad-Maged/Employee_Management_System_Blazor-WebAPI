@@ -1,0 +1,159 @@
+﻿@page "/Employees/Create"
+@using System.Text.Json.Nodes
+
+<div class="row">
+    <div class="col-lg-8">
+        <h1 class="mb-5">New Employee</h1>
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Name</label>
+            <div class="col-md-8">
+                <input class="form-control" @bind="data.Name">
+                <span class="text-danger">@Errors["Name"]?[0]</span>
+            </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Gender</label>
+            <div class="col-md-8">
+                <select class="form-select" @bind="data.Gender">
+                    <option value="">Not Specified</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+                <span class="text-danger">@Errors["Gender"]?[0]</span>
+            </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Email</label>
+            <div class="col-md-8">
+                <input class="form-control" @bind="data.Email">
+                <span class="text-danger">@Errors["Email"]?[0]</span>
+            </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Phone Number</label>
+            <div class="col-md-8">
+                <input class="form-control" @bind="data.PhoneNumber">
+                <span class="text-danger">@Errors["PhoneNumber"]?[0]</span>
+            </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Address</label>
+            <div class="col-md-8">
+                <input class="form-control" @bind="data.Address">
+                <span class="text-danger">@Errors["Address"]?[0]</span>
+            </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Department</label>
+            <div class="col-md-8">
+                <select class="form-select" @bind="data.Department">
+                    <option value="">Choose</option>
+                    <option value="Administration">Administration</option>
+                    <option value="Software">Software</option>
+                    <option value="Artificial Intelligence AI">AI</option>
+                    <option value="Legal">Legal</option>
+                    <option value="Human Resources HR">Human Resources (HR)</option>
+                    <option value="Public Relations PR">Public Relations (PR)</option>
+                    <option value="Customer Support/Service">Customer Support/Service</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Marketing">Marketing</option>
+                </select>
+                <span class="text-danger">@Errors["Department"]?[0]</span>
+            </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Job Title</label>
+            <div class="col-md-8">
+                <input class="form-control" @bind="data.JobTitle">
+                <span class="text-danger">@Errors["JobTitle"]?[0]</span>
+            </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Salary</label>
+            <div class="col-md-8">
+                <input class="form-control" @bind="data.Salary" min="5000">
+                <span class="text-danger">@Errors["Salary"]?[0]</span>
+            </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Start Date</label>
+            <div class="col-md-8">
+                <input type="date" class="form-control" @bind="data.StartDate" />
+                <span class="text-danger">@Errors["StartDate"]?[0]</span>
+            </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Date of Birth</label>
+            <div class="col-md-8">
+                <input type="date" class="form-control" @bind="data.DateOfBirth" />
+                <span class="text-danger">@Errors["DateOfBirth"]?[0]</span>
+            </div>
+        </div>
+
+
+
+
+        <div class="row">
+            <div class="offset-md-4 col-md-4 d-grid">
+                <button class="btn btn-primary" @onclick="AddEmployee">Add</button>
+            </div>
+            <div class="col-md-4 d-grid">
+                <a class="btn btn-outline-primary" href="/Employees">Cancel</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@inject HttpClient Http
+@inject NavigationManager nav
+@code {
+    public JsonNode Errors { get; set; } = new JsonObject();
+    public Models.EmployeeDTO data { get; set; } = new Models.EmployeeDTO
+        {
+            StartDate = DateOnly.FromDateTime(DateTime.Today),
+            DateOfBirth = new DateOnly(2000, 1, 1)
+        };
+
+    protected async Task AddEmployee()
+    {
+        var response = await Http.PostAsJsonAsync("https://employees-system.runasp.net/api/Employee/Add", data);
+        if (response.IsSuccessStatusCode)
+        {
+            nav.NavigateTo("/Employees");
+        }
+        else
+        {
+            var stringResponse = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("Response: " + stringResponse);
+            try
+            {
+                var jsonResponse = JsonNode.Parse(stringResponse);
+                Errors = jsonResponse?["errors"] ?? new JsonObject();
+            }
+            catch (Exception e)
+            {
+                
+            }
+        }
+    }
+}

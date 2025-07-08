@@ -1,0 +1,21 @@
+﻿@page "/Employees/Delete/{Id:int}"
+
+<h1 class="mb-3">Delete Employee</h1>
+<p>Are you sure you want to delete this Employee?</p>
+<button class="btn btn-danger" @onclick="DeleteEmployee">Delete</button>
+<a class="btn btn-secondary" href="/Employees">Cancel</a>
+
+
+
+@inject HttpClient Http
+@inject NavigationManager nav
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    protected async Task DeleteEmployee()
+    {
+        var response = await Http.DeleteAsync($"https://employees-system.runasp.net/api/Employee/Delete/{Id}");
+        nav.NavigateTo("/Employees");
+    }
+}

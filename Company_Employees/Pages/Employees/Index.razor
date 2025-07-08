@@ -1,0 +1,71 @@
+﻿@page "/Employees"
+
+<div class="container-fluid">
+    <h1 class="text-center mb-4">Company Employees</h1>
+    <div class="d-flex justify-content-end mb-3">
+        <a class="btn btn-primary" href="/Employees/Create">Add New Employee</a>
+    </div>
+
+    @if (employees == null)
+    {
+            <p><em>Loading...</em></p>
+    }
+    else
+    {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Address</th>
+                            <th>Department</th>
+                            <th>Job</th>
+                            <th>Salary</th>
+                            <th>Start Date</th>
+                            <th>Birth Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var employee in employees)
+                    {
+                                <tr>
+                                    <td>@employee.Id</td>
+                                    <td>@employee.Name</td>
+                                    <td>@employee.Gender</td>
+                                    <td>@employee.PhoneNumber</td>
+                                    <td>@employee.Email</td>
+                                    <td>@employee.Address</td>
+                                    <td>@employee.Department</td>
+                                    <td>@employee.JobTitle</td>
+                                    <td>@employee.Salary</td>
+                                    <td>@employee.StartDate.ToShortDateString()</td>
+                                    <td>@employee.DateOfBirth.ToShortDateString()</td>
+                                    <td>
+                                        <div class="d-flex gap-1 flex-wrap justify-content-center">
+                                            <a class="btn btn-sm btn-primary" href="/Employees/Edit/@employee.Id">Edit</a>
+                                            <a class="btn btn-sm btn-danger" href="/Employees/Delete/@employee.Id">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+    }
+</div>
+
+@inject HttpClient Http
+
+@code {
+    private List<Models.Employee>? employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        employees = await Http.GetFromJsonAsync<List<Models.Employee>>("https://employees-system.runasp.net/api/Employee/getall");
+    }
+}
